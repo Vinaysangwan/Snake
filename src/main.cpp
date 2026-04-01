@@ -1,12 +1,13 @@
 #include "pch.h"
+#include "utils.h"
 
 int main(void)
 {
   if(!glfwInit())
   {
-    std::cout<<"Failed to Init GLFW"<<std::endl;
+    SN_ASSERT(false, "Failed to Init GLFW!");
     return 0;
   }
 
-  std::cout<<"GLFW Init Success!"<<std::endl;
+  SN_INFO("GLFW Init Success!");
 }

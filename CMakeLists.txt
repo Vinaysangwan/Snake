@@ -8,6 +8,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_executable(${PROJECT_NAME})
 
+# Compile Options
+target_compile_options(${PROJECT_NAME} PRIVATE
+  -Wno-c99-designator
+)
+
 # pch
 target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.h)
 
