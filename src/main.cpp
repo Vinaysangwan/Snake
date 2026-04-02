@@ -16,13 +16,9 @@ int main(void)
   {
     display_update();
 
-    float dt = get_delta_time();
-    static float timer = 0;
-    timer += dt;
-    if (timer >= 1.0f)
+    if (key_down(GLFW_KEY_ESCAPE))
     {
-      SN_INFO("FPS: %d", get_fps());
-      timer = 0;
+      display_close();
     }
 
     display_swap_buffers();

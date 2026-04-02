@@ -43,6 +43,9 @@ bool display_create(const char *title, int width, int height, bool isResizable)
 
   // glfw callbacks
   glfwSetKeyCallback(window, glfw_key_callback);
+  glfwSetCursorPosCallback(window, glfw_cursor_pos_callback);
+  glfwSetMouseButtonCallback(window, glfw_mouse_button_callback);
+  glfwSetScrollCallback(window, glfw_scroll_callback);
 
   // Show Window
   glfwShowWindow(window);

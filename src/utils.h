@@ -42,3 +42,40 @@ inline void logger(LoggerColor color, const char* prefix, const char* msg, Args.
     DEBUG_BREAK();                  \
   }                                 \
 }
+
+// #############################################################################
+//                           Vectors
+// #############################################################################
+struct Vec2
+{
+  union
+  {
+    float values[2];
+
+    struct
+    {
+      float x;
+      float y;
+    };
+  };
+
+  Vec2(float x = 0.0f, float y = 0.0f)
+    : x(x), y(y) { }
+};
+
+struct IVec2
+{
+  union
+  {
+    int values[2];
+
+    struct
+    {
+      int x;
+      int y;
+    };
+  };
+
+  IVec2(int x = 0, int y = 0)
+    : x(x), y(y) { }
+};

@@ -1,7 +1,77 @@
 # Snake
-Made using GLFW in C++
+* Snake Game Made using GLFW and OpenGL in C++
+
+## Build
+  * **Makefile**
+    * Build
+    ```
+    make build
+    ```
+    * Compile
+    ```
+    make compile
+    ```
+    * Run
+    ```
+    make run
+    ```
+
+  * **Without Makefile**
+    * Build
+    ```
+    cmake -S . -B build
+    cmake --build build
+    ```
+    * Run
+    ```
+    ./Snake.exe
+    ```
+
+  * **Ninja**
+    * Build
+    ```
+    cmake -S . -B build -G Ninja
+    cmake --build build
+    ```
+    * Run
+    ```
+    ./Snake.exe
+    ```
 
 ## Progress
-  **1:** Project Setup.
-  **2:** Logger.
-  **3:** Display.
+  ### 1. Project Setup
+  * CMake
+  * GLFW
+  * pch
+
+  ### 2. Logger
+  * SN_INFO
+  * SN_WARN
+  * SN_ERROR
+  * SN_ASSERT
+  
+  ### 3. Display
+  * create
+  * enable vsync
+  * upadte
+  * swapBuffers
+  * close
+  * cleanup
+  * deltaTime
+  * FPS
+  
+  ### 4. Inputs
+  * **Keyboard**
+      * key_down
+      * key_up
+      * key_pressed
+      * key_released
+    
+  * **Mouse**
+      * mouse_button_down
+      * mouse_button_up
+      * mouse_button_pressed
+      * mouse_button_released
+      * get_mouse_scroll_x
+      * get_mouse_scroll_y
+      * get_mouse_scroll
