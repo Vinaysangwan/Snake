@@ -17,7 +17,7 @@ enum LoggerColor
 template<typename ...Args>
 inline void logger(LoggerColor color, const char* prefix, const char* msg, Args... args)
 {
-  char textBuffer[8192] = {};
+  char textBuffer[8192];
 
   if constexpr (sizeof...(args) == 0)
   {
@@ -44,38 +44,23 @@ inline void logger(LoggerColor color, const char* prefix, const char* msg, Args.
 }
 
 // #############################################################################
+//                           File
+// #############################################################################
+char* read_file(const char* filePath);
+
+// #############################################################################
 //                           Vectors
 // #############################################################################
 struct Vec2
 {
-  union
-  {
-    float values[2];
-
-    struct
-    {
-      float x;
-      float y;
-    };
-  };
-
-  Vec2(float x = 0.0f, float y = 0.0f)
-    : x(x), y(y) { }
+  float x;
+  float y;
 };
 
 struct IVec2
 {
-  union
-  {
-    int values[2];
-
-    struct
-    {
-      int x;
-      int y;
-    };
-  };
-
-  IVec2(int x = 0, int y = 0)
-    : x(x), y(y) { }
+  int x;
+  int y;
 };
+
+Vec2 vec2i_f(IVec2 vec);

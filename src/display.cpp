@@ -47,6 +47,19 @@ bool display_create(const char *title, int width, int height, bool isResizable)
   glfwSetMouseButtonCallback(window, glfw_mouse_button_callback);
   glfwSetScrollCallback(window, glfw_scroll_callback);
 
+  // Init glad
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+  {
+    SN_ASSERT(false, "Failed to init Glad");
+    return false;
+  }
+
+  // gl viewport
+  glViewport(0, 0, width, height);
+
+  // gl Enables
+  
+
   // Show Window
   glfwShowWindow(window);
 

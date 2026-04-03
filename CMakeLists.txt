@@ -30,6 +30,10 @@ find_package(OpenGL REQUIRED)
 
 # External Libs
 target_link_libraries(${PROJECT_NAME} PRIVATE 
+  # GLFW
   ${CMAKE_SOURCE_DIR}/vendor/lib/glfw3.lib
   OpenGL::GL
+
+  # Glad
+  ${CMAKE_SOURCE_DIR}/vendor/lib/glad.lib
 )

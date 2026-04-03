@@ -53,7 +53,7 @@
   ### 3. Display
   * create
   * enable vsync
-  * upadte
+  * update
   * swapBuffers
   * close
   * cleanup
@@ -75,3 +75,8 @@
       * get_mouse_scroll_x
       * get_mouse_scroll_y
       * get_mouse_scroll
+  
+  ### 5. OpenGL Renderer
+  * gl_init
+  * gl_render
+  * gl_cleanup

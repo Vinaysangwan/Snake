@@ -2,11 +2,18 @@
 #include "utils.h"
 #include "display.h"
 #include "inputs.h"
+#include "gl.h"
 
 int main(void)
 {
   // Init display
   if(!display_create("Snake", 1280, 720))
+  {
+    return -1;
+  }
+
+  // Init gl
+  if(!gl_init())
   {
     return -1;
   }
@@ -21,9 +28,12 @@ int main(void)
       display_close();
     }
 
+    gl_render();
+
     display_swap_buffers();
   }
 
   // cleanups
+  gl_cleanup();
   display_cleanup();
 }
