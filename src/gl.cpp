@@ -24,7 +24,9 @@ struct GLRenderer
   GLuint textureAtlasID;
   GLuint transformSSBOID;
 
+  // uniform locations
   GLint location_projectionMatrix;
+  GLint location_viewMatrix;
 };
 
 // #############################################################################
@@ -146,13 +148,14 @@ bool gl_init()
   // Set Uniform Locations
   {
     glRenderer.location_projectionMatrix = get_uniform_location(glRenderer.programID, "uProjectionMatrix");
+    glRenderer.location_viewMatrix = get_uniform_location(glRenderer.programID, "uViewMatrix");
   }
 
   // Set Unifom Data
   {
     glUseProgram(glRenderer.programID);
 
-    Mat4 projectionMatrix = projection_orthographic(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+    Mat4 projectionMatrix = projection_orthographic_matrix(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
     glUniformMatrix4fv(glRenderer.location_projectionMatrix, 1, GL_FALSE, &projectionMatrix[0]);
     
     glUseProgram(0);
@@ -168,6 +171,12 @@ void gl_render()
 {
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  // Send View Matrix to GPU
+  {
+    Mat4 viewMatrix = view_matrix(renderState.gameCamera.pos, renderState.gameCamera.size, renderState.gameCamera.rot, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glUniformMatrix4fv(glRenderer.location_viewMatrix, 1, GL_FALSE, &viewMatrix[0]);
+  }
 
   glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderState.transformCount, &renderState.transforms[0]);
   glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderState.transformCount);

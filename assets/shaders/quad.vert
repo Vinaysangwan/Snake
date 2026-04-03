@@ -20,6 +20,7 @@ layout (location = 0) out vec2 outTexCoords;
 
 // uniforms
 uniform mat4 uProjectionMatrix;
+uniform mat4 uViewMatrix;
 
 void main()
 {
@@ -46,7 +47,7 @@ void main()
     vec2(transform.atlasOffset.x + transform.spriteSize.x, transform.atlasOffset.y + transform.spriteSize.y),
   };
 
-  gl_Position = uProjectionMatrix * vec4(vertices[gl_VertexID], 0.0, 1.0);
+  gl_Position = uProjectionMatrix * uViewMatrix * vec4(vertices[gl_VertexID], 0.0, 1.0);
 
   outTexCoords = textureCoords[gl_VertexID];
 }

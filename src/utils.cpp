@@ -49,7 +49,7 @@ Vec2 vec2i_f(IVec2 vec)
 // #############################################################################
 //                           Mat4
 // #############################################################################
-Mat4 projection_orthographic(float left, float right, float top, float bottom)
+Mat4 projection_orthographic_matrix(float left, float right, float top, float bottom)
 {
   Mat4 result = {0};
 
@@ -63,4 +63,27 @@ Mat4 projection_orthographic(float left, float right, float top, float bottom)
   result.cw = 0.0f;
   
   return result;
+}
+
+Mat4 view_matrix(Vec2 pos, Vec2 size, float rot, int screenW, int screenH)
+{
+  Mat4 view = {0};
+  float rad = DEG_2_RAD * rot;
+  float cosV = cosf(rad);
+  float sinV = sinf(rad);
+  float zoomX = screenW / size.x;
+  float zoomY = screenH / size.y;
+  float tx = -pos.x;
+  float ty = -pos.y;
+
+  view.ax = cosV * zoomX;
+  view.bx = -sinV * zoomX;
+  view.ay = sinV * zoomY;
+  view.by = cosV * zoomY;
+  view.cz = 1.0f;
+  view.dw = 1.0f;
+  view.aw = (tx * cosV + ty * sinV) * zoomX + screenW * 0.5f;
+  view.bw = (tx * (-sinV) + ty * cosV) * zoomY + screenH * 0.5f;
+
+  return view;
 }

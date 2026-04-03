@@ -137,4 +137,10 @@ struct Mat4
   }
 };
 
-Mat4 projection_orthographic(float left, float right, float top, float bottom);
+Mat4 projection_orthographic_matrix(float left, float right, float top, float bottom);
+Mat4 view_matrix(Vec2 pos, Vec2 size, float rot, int screenW, int screenH);
+
+// #############################################################################
+//                           Math
+// #############################################################################
+constexpr float DEG_2_RAD = 0.0174532925199433;

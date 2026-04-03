@@ -9,8 +9,18 @@
 // #############################################################################
 void game_init()
 {
-  gameState.playerID = SPRITE_SLIME;
-  gameState.playerPos = {0, 0};
+  // Init game Camera
+  {
+    Camera &gameCamera = renderState.gameCamera;
+    gameCamera.pos = {WORLD_WIDTH / 2, WORLD_HEIGHT / 2};
+    gameCamera.size = {WORLD_WIDTH, WORLD_HEIGHT};
+  }
+  
+  // Init Player Data
+  {
+    gameState.playerID = SPRITE_SLIME;
+    gameState.playerPos = {0, 0};
+  }
 }
 
 void game_update(float dt)
@@ -25,5 +35,5 @@ void game_update(float dt)
 
 void game_render()
 {
-  render_sprite(gameState.playerID, gameState.playerPos, 2.0f);
+  render_sprite(gameState.playerID, gameState.playerPos, 1.0f);
 }

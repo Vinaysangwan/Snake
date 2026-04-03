@@ -17,8 +17,17 @@ struct Transform
   IVec2 spriteSize;
 };
 
+struct Camera
+{
+  Vec2 pos;
+  Vec2 size;
+  float rot = 0.0f;
+};
+
 struct RenderState
 {
+  Camera gameCamera;
+  
   Transform transforms[MAX_TRANSFORM_COUNT];
   int transformCount = 0;
 };
