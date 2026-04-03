@@ -4,6 +4,7 @@
 #include "inputs.h"
 #include "gl.h"
 #include "game.h"
+#include "config.h"
 
 // #############################################################################
 //                           Constants
@@ -17,7 +18,7 @@ constexpr const float TARGET_DELTA_TIME = 1.0f / TARGET_FPS;
 int main(void)
 {
   // Init display
-  if(!display_create("Snake", 1280, 720))
+  if(!display_create("Snake", WINDOW_WIDTH, WINDOW_HEIGHT))
   {
     return -1;
   }

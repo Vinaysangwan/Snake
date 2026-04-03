@@ -45,3 +45,22 @@ Vec2 vec2i_f(IVec2 vec)
     (float)vec.y
   );
 }
+
+// #############################################################################
+//                           Mat4
+// #############################################################################
+Mat4 projection_orthographic(float left, float right, float top, float bottom)
+{
+  Mat4 result = {0};
+
+  result.ax = 2.0f / (right - left);
+  result.by = 2.0f / (top - bottom);
+  result.cz = -2.0f;
+  result.dw = 1.0f;
+
+  result.aw = -(right + left) / (right - left);
+  result.bw = -(top + bottom) / (top - bottom);
+  result.cw = 0.0f;
+  
+  return result;
+}

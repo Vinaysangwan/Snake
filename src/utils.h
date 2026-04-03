@@ -67,4 +67,74 @@ struct IVec2
   int y;
 };
 
+struct Vec3
+{
+  float x;
+  float y;
+  float z;
+};
+
+struct Vec4
+{
+  union
+  {
+    struct
+    {
+      float x;
+      float y;
+      float z;
+      float w;
+    };
+
+    struct
+    {
+      float r;
+      float g;
+      float b;
+      float a;
+    };
+  };
+};
+
 Vec2 vec2i_f(IVec2 vec);
+
+// #############################################################################
+//                           Mat4
+// #############################################################################
+struct Mat4
+{
+  union
+  {
+    float values[16];
+
+    struct
+    {
+      float ax;
+      float bx;
+      float cx;
+      float dx;
+
+      float ay;
+      float by;
+      float cy;
+      float dy;
+
+      float az;
+      float bz;
+      float cz;
+      float dz;
+
+      float aw;
+      float bw;
+      float cw;
+      float dw;
+    };
+  };
+
+  inline float &operator[](int idx)
+  {
+    return values[idx];
+  }
+};
+
+Mat4 projection_orthographic(float left, float right, float top, float bottom);

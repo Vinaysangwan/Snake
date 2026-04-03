@@ -2,6 +2,7 @@
 #include "gl.h"
 #include "utils.h"
 #include "renderer.h"
+#include "config.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -22,6 +23,8 @@ struct GLRenderer
   GLuint VAO;
   GLuint textureAtlasID;
   GLuint transformSSBOID;
+
+  GLint location_projectionMatrix;
 };
 
 // #############################################################################
@@ -32,6 +35,17 @@ static GLRenderer glRenderer;
 // #############################################################################
 //                           Functions
 // #############################################################################
+GLint get_uniform_location(GLuint programID, const char* name)
+{
+  GLint location = glGetUniformLocation(programID, name);
+  if (location < 0)
+  {
+    SN_ERROR("Failed to Get Uniform Location: %s in Shader Program[%u]", name, programID);
+  }
+
+  return location;
+}
+
 GLuint create_shader_id(const char* shaderPath, GLenum type)
 {
   const char* shaderSource = read_file(shaderPath);
@@ -127,6 +141,21 @@ bool gl_init()
     glGenBuffers(1, &glRenderer.transformSSBOID);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, glRenderer.transformSSBOID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Transform) * MAX_TRANSFORM_COUNT, nullptr, GL_DYNAMIC_DRAW);
+  }
+
+  // Set Uniform Locations
+  {
+    glRenderer.location_projectionMatrix = get_uniform_location(glRenderer.programID, "uProjectionMatrix");
+  }
+
+  // Set Unifom Data
+  {
+    glUseProgram(glRenderer.programID);
+
+    Mat4 projectionMatrix = projection_orthographic(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+    glUniformMatrix4fv(glRenderer.location_projectionMatrix, 1, GL_FALSE, &projectionMatrix[0]);
+    
+    glUseProgram(0);
   }
 
   // use program
