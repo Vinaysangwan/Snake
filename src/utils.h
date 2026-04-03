@@ -5,6 +5,10 @@
 // #############################################################################
 #ifdef _WIN32
   #define DEBUG_BREAK() __debugbreak()
+#elif __APPLE__
+  #define DEBUG_BREAK() __builtin_debugtrap()
+#elif __linux__
+  #define DEBUG_BREAK() __builtin_trap()
 #endif
 
 enum LoggerColor

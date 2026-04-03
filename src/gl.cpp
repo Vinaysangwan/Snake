@@ -2,11 +2,15 @@
 #include "gl.h"
 #include "utils.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 // #############################################################################
 //                           Constants
 // #############################################################################
 constexpr const char* VERT_FILE_PATH = "assets/shaders/quad.vert";
 constexpr const char* FRAG_FILE_PATH = "assets/shaders/quad.frag";
+constexpr const char* TEXTURE_ATLAS_PATH = "assets/textures/Texture_Atlas.png";
 
 // #############################################################################
 //                           Structs
@@ -15,6 +19,7 @@ struct GLRenderer
 {
   GLuint programID;
   GLuint VAO;
+  GLuint textureAtlasID;
 };
 
 // #############################################################################
@@ -45,6 +50,7 @@ GLuint create_shader_id(const char* shaderPath, GLenum type)
     return 0;
   }
 
+  free((void*)shaderSource);
   return shaderID;
 }
 
@@ -80,6 +86,34 @@ bool gl_init()
     glDeleteShader(fragID);
   }
 
+  // init textureID
+  {
+    glGenTextures(1, &glRenderer.textureAtlasID);  
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, glRenderer.textureAtlasID);
+
+    // Texture data
+    int width, height, nChannels;
+    unsigned char* data = stbi_load(TEXTURE_ATLAS_PATH, &width, &height, &nChannels, 4);
+    if (!data)
+    {
+      SN_ASSERT(false, "Failed to open the texture atlas: %s", TEXTURE_ATLAS_PATH);
+      return false;
+    }
+
+    // texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // load texture data
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    stbi_image_free(data);
+  }
+  
   // init VAO
   {
     glGenVertexArrays(1, &glRenderer.VAO);

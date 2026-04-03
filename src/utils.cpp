@@ -7,7 +7,13 @@
 char* read_file(const char* filePath)
 {
   FILE *file;
+
+#ifdef _WIN32
   if(fopen_s(&file, filePath, "rb") == 0)
+#else
+  file = fopen(filePath, "rb");
+  if(file)
+#endif
   {
     size_t size;
     fseek(file, 0, SEEK_END);

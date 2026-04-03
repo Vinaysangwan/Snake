@@ -1,13 +1,19 @@
 #version 430 core
 
 // inputs
+layout (location = 0) in vec2 inTexCoords;
 
 // output
 layout (location = 0) out vec4 outColor;
 
 // uniforms
+uniform sampler2D uTextureSampler;
 
 void main()
 {
-  outColor = vec4(1.0, 1.0, 1.0, 1.0);
+  vec4 textureColor = texelFetch(uTextureSampler, ivec2(inTexCoords), 0);
+  if (textureColor.a < 0.1)
+    discard;
+  
+  outColor = textureColor;
 }

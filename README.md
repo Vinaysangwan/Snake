@@ -80,3 +80,7 @@
   * gl_init
   * gl_render
   * gl_cleanup
+
+  ### 6. Texture Rendering
+  * texelFetch
+  * stbi_image.h
