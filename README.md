@@ -84,3 +84,8 @@
   ### 6. Texture Rendering
   * texelFetch
   * stbi_image.h
+
+  ### 7. Sprite Rendering
+  * SSBO(shader Storage Buffer Object)
+  * RenderState
+  * GameState

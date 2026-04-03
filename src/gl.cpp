@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "gl.h"
 #include "utils.h"
+#include "renderer.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -20,6 +21,7 @@ struct GLRenderer
   GLuint programID;
   GLuint VAO;
   GLuint textureAtlasID;
+  GLuint transformSSBOID;
 };
 
 // #############################################################################
@@ -86,6 +88,12 @@ bool gl_init()
     glDeleteShader(fragID);
   }
 
+  // init VAO
+  {
+    glGenVertexArrays(1, &glRenderer.VAO);
+    glBindVertexArray(glRenderer.VAO);
+  }
+
   // init textureID
   {
     glGenTextures(1, &glRenderer.textureAtlasID);  
@@ -114,10 +122,11 @@ bool gl_init()
     stbi_image_free(data);
   }
   
-  // init VAO
+  // Init transformSSBOID
   {
-    glGenVertexArrays(1, &glRenderer.VAO);
-    glBindVertexArray(glRenderer.VAO);
+    glGenBuffers(1, &glRenderer.transformSSBOID);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, glRenderer.transformSSBOID);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Transform) * MAX_TRANSFORM_COUNT, nullptr, GL_DYNAMIC_DRAW);
   }
 
   // use program
@@ -131,7 +140,9 @@ void gl_render()
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderState.transformCount, &renderState.transforms[0]);
+  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderState.transformCount);
+  renderState.transformCount = 0;
 }
 
 void gl_cleanup()
