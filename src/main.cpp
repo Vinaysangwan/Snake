@@ -22,6 +22,7 @@ int main(void)
   {
     return -1;
   }
+  display_vsync(true);
 
   // Init gl
   if(!gl_init())
@@ -38,6 +39,13 @@ int main(void)
     display_update();
 
     float dt = get_delta_time();
+    static float timer = 0;
+    timer += dt;
+    if (timer >= 1.0f)
+    {
+      timer = 0;
+      SN_INFO("FPS: %d", get_fps());
+    }
 
     if (key_down(GLFW_KEY_ESCAPE))
     {

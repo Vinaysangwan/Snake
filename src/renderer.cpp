@@ -10,7 +10,7 @@ RenderState renderState = {};
 // #############################################################################
 //                           Functions
 // #############################################################################
-void render_sprite(SpriteID spriteID, Vec2 pos, float scale)
+void render_sprite(SpriteID spriteID, Vec2 pos, float scale, int animIdx)
 {
   if (renderState.transformCount >= MAX_TRANSFORM_COUNT)
   {
@@ -24,8 +24,21 @@ void render_sprite(SpriteID spriteID, Vec2 pos, float scale)
     .pos = {pos.x - size.x / 2, pos.y - size.y / 2},
     .size = size,
     .atlasOffset = sprite.atlasOffset,
-    .spriteSize = sprite.size
+    .spriteSize = sprite.size,
+    .animIdx = animIdx
   };
 
   renderState.transforms[renderState.transformCount++] = transform;
+}
+
+int animate(SpriteID spriteID, float &timer, float duration, float dt)
+{
+  Sprite sprite = SPRITES[spriteID];
+  timer += dt;
+  while (timer > duration)
+  {
+    timer -= duration;
+  }
+
+  return (int)(sprite.frameCount * timer / duration);
 }

@@ -4,10 +4,18 @@
 // #############################################################################
 //                           Structs
 // #############################################################################
+struct Entity
+{
+  SpriteID spriteID;
+  Vec2 pos;
+  float timer = 0.0f;
+  int animIdx = 0;
+};
+
 struct GameState
 {
-  SpriteID playerID;
-  Vec2 playerPos;
+  Entity player;
+  Entity bat;
 };
 
 // #############################################################################

@@ -97,3 +97,7 @@
   ### 9. View Matrix
   * Camera
   * view Matrix
+
+  ### 10. Added Animation
+  * animIdx
+  * animate

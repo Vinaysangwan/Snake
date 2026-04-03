@@ -7,6 +7,8 @@ struct Transform
   vec2 size;
   ivec2 atlasOffset;
   ivec2 spriteSize;
+  int animIdx;
+  int padding[3];
 };
 
 // buffers
@@ -37,6 +39,11 @@ void main()
     vec2(transform.pos.x + transform.size.x, transform.pos.y + transform.size.y),       // right bottom
   };
 
+  gl_Position = uProjectionMatrix * uViewMatrix * vec4(vertices[gl_VertexID], 0.0, 1.0);
+
+  // Texture Coords
+  transform.atlasOffset.x += transform.animIdx * transform.spriteSize.x;
+
   vec2 textureCoords[6] = {
     transform.atlasOffset,
     vec2(transform.atlasOffset.x, transform.atlasOffset.y + transform.spriteSize.y),
@@ -46,8 +53,6 @@ void main()
     vec2(transform.atlasOffset.x, transform.atlasOffset.y + transform.spriteSize.y),
     vec2(transform.atlasOffset.x + transform.spriteSize.x, transform.atlasOffset.y + transform.spriteSize.y),
   };
-
-  gl_Position = uProjectionMatrix * uViewMatrix * vec4(vertices[gl_VertexID], 0.0, 1.0);
 
   outTexCoords = textureCoords[gl_VertexID];
 }

@@ -15,6 +15,8 @@ struct Transform
   Vec2 size;
   IVec2 atlasOffset;
   IVec2 spriteSize;
+  int animIdx;
+  int padding[3];
 };
 
 struct Camera
@@ -40,4 +42,5 @@ extern RenderState renderState;
 // #############################################################################
 //                           Functions
 // #############################################################################
-void render_sprite(SpriteID spriteID, Vec2 pos = {0, 0}, float scale = 1.0f);
+void render_sprite(SpriteID spriteID, Vec2 pos = {0, 0}, float scale = 1.0f, int animIdx = 0);
+int animate(SpriteID spriteID, float &timer, float duration, float dt);
