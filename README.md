@@ -101,3 +101,7 @@
   ### 10. Added Animation
   * animIdx
   * animate
+
+  ### 11. Map Rendering
+  * MAP array
+  * Map Sprites

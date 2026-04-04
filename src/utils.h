@@ -144,3 +144,21 @@ Mat4 view_matrix(Vec2 pos, Vec2 size, float rot, int screenW, int screenH);
 //                           Math
 // #############################################################################
 constexpr float DEG_2_RAD = 0.0174532925199433;
+
+template <typename T>
+inline constexpr T min(T a, T b)
+{
+  return a > b ? b : a;
+}
+
+template <typename T>
+inline constexpr T max(T a, T b)
+{
+  return a > b ? a : b;
+}
+
+template <typename T>
+inline constexpr T clamp(T v, T l, T h)
+{
+  return max(min(v, h), l);
+}
