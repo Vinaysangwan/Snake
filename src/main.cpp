@@ -5,6 +5,7 @@
 #include "gl.h"
 #include "game.h"
 #include "config.h"
+#include "audio.h"
 
 // #############################################################################
 //                           Constants
@@ -23,6 +24,12 @@ int main(void)
     return -1;
   }
   display_vsync(true);
+
+  // Init audio
+  if (!audio_init())
+  {
+    return -1;
+  }
 
   // Init gl
   if(!gl_init())
@@ -47,6 +54,7 @@ int main(void)
       SN_INFO("FPS: %d", get_fps());
     }
 
+    // TODO: Remove this when creating menu
     if (key_down(GLFW_KEY_ESCAPE))
     {
       display_close();
@@ -71,6 +79,8 @@ int main(void)
   }
 
   // cleanups
+  game_cleanup();
   gl_cleanup();
+  audio_close();
   display_cleanup();
 }

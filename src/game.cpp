@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include "inputs.h"
 #include "config.h"
+#include <fstream>
 
 // #############################################################################
 //                           Constants
@@ -54,6 +55,17 @@ void game_init()
     bat.spriteID = SPRITE_BAT;
     bat.pos = {WORLD_WIDTH / 2, WORLD_HEIGHT / 2};
   }
+
+  // Init Music
+  {
+    gameState.gameMusic = music_load("assets/audio/theme.mp3");
+    music_play(gameState.gameMusic);
+  }
+
+  // Init sounds
+  {
+    gameState.bounceSound = sound_load("assets/audio/collect.wav");
+  }
 }
 
 void game_update(float dt)
@@ -67,9 +79,41 @@ void game_update(float dt)
     if (key_down(GLFW_KEY_S)) player.pos.y += SPEED;
     if (key_down(GLFW_KEY_A)) player.pos.x -= SPEED;
     if (key_down(GLFW_KEY_D)) player.pos.x += SPEED;
+    if (key_pressed(GLFW_KEY_Q))
+    {
+      SN_INFO("Music: is %s", music_is_playing(gameState.gameMusic) ? "Playing" : "Not Playing");
+    }
 
-    player.pos.x = clamp(player.pos.x, LEFT_WALL + 10, RIGHT_WALL - 10);
-    player.pos.y = clamp(player.pos.y, TOP_WALL + 10, BOTTOM_WALL - 10);
+    // handle wall Collision
+    bool bounceSoundPlay = false;
+    static bool prevBounceSoundPlay = bounceSoundPlay;
+    if (player.pos.x < LEFT_WALL + 10)
+    {
+      player.pos.x = LEFT_WALL + 10;
+      bounceSoundPlay = true;
+    }
+    else if(player.pos.x > RIGHT_WALL - 10)
+    {
+      player.pos.x = RIGHT_WALL - 10;
+      bounceSoundPlay = true;
+    }
+
+    if (player.pos.y < TOP_WALL + 10)
+    {
+      player.pos.y = TOP_WALL + 10;
+      bounceSoundPlay = true;
+    }
+    else if(player.pos.y > BOTTOM_WALL - 10)
+    {
+      player.pos.y = BOTTOM_WALL - 10;
+      bounceSoundPlay = true;
+    }
+
+    if (bounceSoundPlay && !prevBounceSoundPlay)
+    {
+      sound_play(gameState.bounceSound);
+    }
+    prevBounceSoundPlay = bounceSoundPlay;
   }
 
   // Update Bat
@@ -79,6 +123,7 @@ void game_update(float dt)
     if (bat.pos.x <= LEFT_WALL + 10 || bat.pos.x >= RIGHT_WALL - 10)
     {
       direction *= -1;
+      sound_play(gameState.bounceSound);
     }
     bat.pos.x += direction * SPEED;
   }
@@ -105,4 +150,12 @@ void game_render()
   // render player
   Entity &player = gameState.player;
   render_sprite(player.spriteID, player.pos, 1.0f, player.animIdx);
+}
+
+void game_cleanup()
+{
+  music_stop(gameState.gameMusic);
+  music_free(gameState.gameMusic);
+
+  sound_free(gameState.bounceSound);
 }

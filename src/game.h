@@ -1,5 +1,6 @@
 #pragma once
 #include "assets.h"
+#include "audio.h"
 
 // #############################################################################
 //                           Structs
@@ -14,6 +15,13 @@ struct Entity
 
 struct GameState
 {
+  // music
+  Music *gameMusic;
+
+  // sounds
+  Sound *bounceSound;
+  
+  // entities
   Entity player;
   Entity bat;
 };
@@ -29,3 +37,4 @@ static GameState gameState;
 void game_init();
 void game_update(float dt);
 void game_render();
+void game_cleanup();

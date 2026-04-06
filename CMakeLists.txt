@@ -29,11 +29,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 find_package(OpenGL REQUIRED)
 
 # External Libs
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-  # GLFW
+target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/vendor/lib/glfw3.lib
   OpenGL::GL
-
-  # Glad
   ${CMAKE_SOURCE_DIR}/vendor/lib/glad.lib
 )

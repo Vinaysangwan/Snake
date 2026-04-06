@@ -36,7 +36,7 @@ struct Sprite
   int frameCount = 1;
 };
 
-static const Sprite SPRITES[SPRITE_COUNT] = {
+inline constexpr const Sprite SPRITES[SPRITE_COUNT] = {
   [SPRITE_SLIME] = {.atlasOffset = {0, 0}, .size = {20, 20}, .frameCount = 2},
   [SPRITE_BAT] = {.atlasOffset = {0, 20}, .size = {20, 20}, .frameCount = 4},
 

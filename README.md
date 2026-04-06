@@ -105,3 +105,9 @@
   ### 11. Map Rendering
   * MAP array
   * Map Sprites
+
+  ### 12. Audio
+  * Audio Engine
+  * Sound
+  * Music
+
