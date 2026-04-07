@@ -38,12 +38,12 @@ char* read_file(const char* filePath)
 // #############################################################################
 //                           Vectors
 // #############################################################################
-Vec2 vec2i_f(IVec2 vec)
+Vec2 ivec2_f(const IVec2 &vec)
 {
-  return Vec2(
+  return Vec2{
     (float)vec.x,
     (float)vec.y
-  );
+  };
 }
 
 // #############################################################################
@@ -86,4 +86,36 @@ Mat4 view_matrix(Vec2 pos, Vec2 size, float rot, int screenW, int screenH)
   view.bw = (tx * (-sinV) + ty * cosV) * zoomY + screenH * 0.5f;
 
   return view;
+}
+
+// #############################################################################
+//                           Math
+// #############################################################################
+void random_init_seed()
+{
+  srand(time(NULL));
+}
+
+int random_get_int(int min, int max)
+{
+  return (rand() % (max - min + 1)) + min;
+}
+
+float random_get_float(float max)
+{
+  return (float)rand() / (float)RAND_MAX;
+}
+
+// #############################################################################
+//                           Collisions
+// #############################################################################
+bool collision_rects(const Rect &a, const Rect &b)
+{
+  return (a.pos.x < b.pos.x + b.size.x && a.pos.x + a.size.x > b.pos.x &&
+          a.pos.y < b.pos.y + b.size.y && a.pos.y + a.size.y > b.pos.y);
+}
+
+bool collision_irects(const IRect &a, const IRect &b)
+{
+  return false;
 }

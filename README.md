@@ -111,3 +111,7 @@
   * Sound
   * Music
 
+  ### 13. Score
+  * update score
+  * spawn_bat
+

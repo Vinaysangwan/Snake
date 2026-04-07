@@ -6,6 +6,7 @@
 #include "game.h"
 #include "config.h"
 #include "audio.h"
+#include "renderer.h"
 
 // #############################################################################
 //                           Constants
@@ -31,6 +32,12 @@ int main(void)
     return -1;
   }
 
+  // Init random seed
+  random_init_seed();
+
+  // size of transform
+  SN_INFO("Size of Transform: %zu", sizeof(Transform));
+
   // Init gl
   if(!gl_init())
   {
@@ -46,12 +53,17 @@ int main(void)
     display_update();
 
     float dt = get_delta_time();
-    static float timer = 0;
-    timer += dt;
-    if (timer >= 1.0f)
+
+    // Print FPS
+    if (false)
     {
-      timer = 0;
-      SN_INFO("FPS: %d", get_fps());
+      static float timer = 0;
+      timer += dt;
+      if (timer >= 1.0f)
+      {
+        timer = 0;
+        SN_INFO("FPS: %d", get_fps());
+      }
     }
 
     // TODO: Remove this when creating menu

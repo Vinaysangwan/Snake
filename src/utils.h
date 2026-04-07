@@ -59,19 +59,38 @@ struct Vec2
 {
   float x;
   float y;
+
+  constexpr Vec2() : x(0), y(0) { }
+  constexpr Vec2(float x, float y) : x(x), y(y) { }
 };
 
 struct IVec2
 {
   int x;
   int y;
+
+  constexpr IVec2() : x(0), y(0) { }
+  constexpr IVec2(int x, int y) : x(x), y(y) { }
 };
 
 struct Vec3
 {
-  float x;
-  float y;
-  float z;
+  union
+  {
+    struct
+    {
+      float x;
+      float y;
+      float z;
+    };
+
+    struct
+    {
+      float r;
+      float g;
+      float b;
+    };
+  };
 };
 
 struct Vec4
@@ -96,7 +115,7 @@ struct Vec4
   };
 };
 
-Vec2 vec2i_f(IVec2 vec);
+Vec2 ivec2_f(const IVec2 &vec);
 
 // #############################################################################
 //                           Mat4
@@ -177,3 +196,14 @@ inline constexpr T clamp(T v, T l, T h)
 {
   return max(min(v, h), l);
 }
+
+// random number
+void random_init_seed();
+int random_get_int(int min, int max);
+float random_get_float(float max = 1.0f);
+
+// #############################################################################
+//                           Collisions
+// #############################################################################
+bool collision_rects(const Rect &a, const Rect &b);
+bool collision_irects(const IRect &a, const IRect &b);

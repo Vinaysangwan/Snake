@@ -15,11 +15,17 @@ struct Entity
 
 struct GameState
 {
+  // debug
+  bool debug;
+  
   // music
   Music *gameMusic;
 
   // sounds
   Sound *bounceSound;
+
+  // Score
+  int score = 0;
   
   // entities
   Entity player;

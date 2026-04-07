@@ -7,8 +7,7 @@ struct Transform
   vec2 size;
   ivec2 atlasOffset;
   ivec2 spriteSize;
-  int animIdx;
-  int padding[3];
+  vec4 tintColor;
 };
 
 // buffers
@@ -19,6 +18,7 @@ layout (std430, binding = 0) buffer TransformSSBO
 
 // output
 layout (location = 0) out vec2 outTexCoords;
+layout (location = 1) out vec3 outTintColor;
 
 // uniforms
 uniform mat4 uProjectionMatrix;
@@ -42,7 +42,7 @@ void main()
   gl_Position = uProjectionMatrix * uViewMatrix * vec4(vertices[gl_VertexID], 0.0, 1.0);
 
   // Texture Coords
-  transform.atlasOffset.x += transform.animIdx * transform.spriteSize.x;
+  transform.atlasOffset.x += int(transform.tintColor.a) * transform.spriteSize.x;
 
   vec2 textureCoords[6] = {
     transform.atlasOffset,
@@ -55,4 +55,5 @@ void main()
   };
 
   outTexCoords = textureCoords[gl_VertexID];
+  outTintColor = transform.tintColor.rgb;
 }

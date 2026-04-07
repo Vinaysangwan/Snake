@@ -6,6 +6,7 @@
 // #############################################################################
 enum SpriteID
 {
+  SPRITE_QUAD,
   SPRITE_SLIME,
   SPRITE_BAT,
 
@@ -33,12 +34,16 @@ struct Sprite
 {
   IVec2 atlasOffset;
   IVec2 size;
+  IVec2 colliderOffset = IVec2{};
+  IVec2 colliderSize = size;
   int frameCount = 1;
 };
 
 inline constexpr const Sprite SPRITES[SPRITE_COUNT] = {
-  [SPRITE_SLIME] = {.atlasOffset = {0, 0}, .size = {20, 20}, .frameCount = 2},
-  [SPRITE_BAT] = {.atlasOffset = {0, 20}, .size = {20, 20}, .frameCount = 4},
+  [SPRITE_QUAD] = {.atlasOffset = {0, 40}, .size = {1, 1}},
+  
+  [SPRITE_SLIME] = {.atlasOffset = {0, 0}, .size = {20, 20}, .colliderOffset = {2, 4}, .colliderSize = {15, 12}, .frameCount = 2},
+  [SPRITE_BAT] = {.atlasOffset = {0, 20}, .size = {20, 20}, .colliderOffset = {6, 5}, .colliderSize = {7, 6}, .frameCount = 4},
 
   [SPRITE_WALL_00] = {.atlasOffset = { 0, 100}, .size = {20, 20}},
   [SPRITE_WALL_01] = {.atlasOffset = {20, 100}, .size = {20, 20}},
