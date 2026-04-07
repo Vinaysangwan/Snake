@@ -114,4 +114,3 @@
   ### 13. Score
   * update score
   * spawn_bat
-

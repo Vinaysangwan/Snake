@@ -6,7 +6,7 @@
 #include "game.h"
 #include "config.h"
 #include "audio.h"
-#include "renderer.h"
+#include "shared_header.h"
 
 // #############################################################################
 //                           Constants

@@ -13,6 +13,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
   -Wno-c99-designator
 )
 
+# defines
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  ENGINE
+)
+
 # pch
 target_precompile_headers(${PROJECT_NAME} PRIVATE src/pch.h)
 
@@ -31,6 +36,8 @@ find_package(OpenGL REQUIRED)
 # External Libs
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${CMAKE_SOURCE_DIR}/vendor/lib/glfw3.lib
-  OpenGL::GL
   ${CMAKE_SOURCE_DIR}/vendor/lib/glad.lib
+  ${CMAKE_SOURCE_DIR}/vendor/lib/freetype.lib
+
+  OpenGL::GL
 )

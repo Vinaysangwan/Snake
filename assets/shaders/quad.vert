@@ -1,14 +1,3 @@
-#version 430 core
-
-// structs
-struct Transform
-{
-  vec2 pos;
-  vec2 size;
-  ivec2 atlasOffset;
-  ivec2 spriteSize;
-  vec4 tintColor;
-};
 
 // buffers
 layout (std430, binding = 0) buffer TransformSSBO

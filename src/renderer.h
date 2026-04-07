@@ -1,5 +1,6 @@
 #pragma once
 #include "assets.h"
+#include "shared_header.h"
 
 // #############################################################################
 //                           Constants
@@ -9,13 +10,12 @@ constexpr const int MAX_TRANSFORM_COUNT = 1000;
 // #############################################################################
 //                           Structs
 // #############################################################################
-struct Transform
+struct Glyph
 {
-  Vec2 pos;
-  Vec2 size;
-  IVec2 atlasOffset;
-  IVec2 spriteSize;
-  Vec4 tintColor;
+  Vec2 offset;
+  Vec2 advance;
+  IVec2 textureCoords;
+  IVec2 size;
 };
 
 struct Camera
@@ -28,6 +28,9 @@ struct Camera
 struct RenderState
 {
   Camera gameCamera;
+
+  int fontHeight;
+  Glyph glyphs[127];
   
   Transform transforms[MAX_TRANSFORM_COUNT];
   int transformCount = 0;

@@ -197,6 +197,11 @@ inline constexpr T clamp(T v, T l, T h)
   return max(min(v, h), l);
 }
 
+inline constexpr int BIT(int x)
+{
+  return 1 << x;
+}
+
 // random number
 void random_init_seed();
 int random_get_int(int min, int max);

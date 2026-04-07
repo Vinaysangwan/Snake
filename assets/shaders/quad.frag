@@ -1,4 +1,3 @@
-#version 430 core
 
 // inputs
 layout (location = 0) in vec2 inTexCoords;

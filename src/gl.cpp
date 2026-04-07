@@ -7,12 +7,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 // #############################################################################
 //                           Constants
 // #############################################################################
 constexpr const char* VERT_FILE_PATH = "assets/shaders/quad.vert";
 constexpr const char* FRAG_FILE_PATH = "assets/shaders/quad.frag";
 constexpr const char* TEXTURE_ATLAS_PATH = "assets/textures/Texture_Atlas.png";
+constexpr const char* FONT_FILE_PATH = "assets/fonts/04B_30.ttf";
 
 // #############################################################################
 //                           Structs
@@ -23,6 +27,7 @@ struct GLRenderer
   GLuint VAO;
   GLuint textureAtlasID;
   GLuint transformSSBOID;
+  GLuint fontAtlasID;
 
   // uniform locations
   GLint location_projectionMatrix;
@@ -35,7 +40,7 @@ struct GLRenderer
 static GLRenderer glRenderer;
 
 // #############################################################################
-//                           Functions
+//                           Internal Functions
 // #############################################################################
 GLint get_uniform_location(GLuint programID, const char* name)
 {
@@ -50,9 +55,24 @@ GLint get_uniform_location(GLuint programID, const char* name)
 
 GLuint create_shader_id(const char* shaderPath, GLenum type)
 {
+  const char* sharedSource = read_file("src/shared_header.h");
   const char* shaderSource = read_file(shaderPath);
+  const char* code[]
+  {
+    "#version 430 core\r\n",
+    sharedSource,
+    shaderSource
+  };
+
+  // for (int i=0; i<3; ++i)
+  // {
+  //   printf("%s", code[i]);
+  // }
+
+  // printf("\n");
+
   GLuint shaderID = glCreateShader(type);
-  glShaderSource(shaderID, 1, &shaderSource, nullptr);
+  glShaderSource(shaderID, sizeof(code) / sizeof(code[0]), code, nullptr);
   glCompileShader(shaderID);
 
   int success;
@@ -69,9 +89,107 @@ GLuint create_shader_id(const char* shaderPath, GLenum type)
   }
 
   free((void*)shaderSource);
+  free((void*)sharedSource);
   return shaderID;
 }
 
+bool load_font(const char* fontFilePath, int fontSize)
+{
+  // init library
+  FT_Library ftLib;
+  if (FT_Init_FreeType(&ftLib))
+  {
+    SN_ERROR("Failed to Init Free type Lib");
+    return false;
+  }
+
+  // init face
+  FT_Face face;
+  if (FT_New_Face(ftLib, fontFilePath, 0, &face))
+  {
+    SN_ERROR("Failed to open the font file Path: %s", FONT_FILE_PATH);
+    return false;
+  }
+  FT_Set_Pixel_Sizes(face, 0, fontSize);
+
+  int padding = 2;
+  int row = 0;
+  int col = padding;
+
+  const int TEXTURE_WIDTH = 512;
+  char textureBuffer[TEXTURE_WIDTH * TEXTURE_WIDTH];
+  for (FT_ULong glyphIdx = 0; glyphIdx < 217; ++glyphIdx)
+  {
+    FT_UInt glyphIndex = FT_Get_Char_Index(face, glyphIdx);
+    FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT);
+    if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
+    {
+      SN_ERROR("Failed to load Glyph render: %d", glyphIdx);
+      return false;
+    }
+
+    if (col + face->glyph->bitmap.width + padding >= 512)
+    {
+      col = padding;
+      row += fontSize;
+    }
+
+    // Font Height
+    renderState.fontHeight = 
+      max(int(face->size->metrics.ascender - face->size->metrics.descender) >> 6, 
+          renderState.fontHeight);
+
+    for (unsigned int y = 0; y < face->glyph->bitmap.rows; ++y)
+    {
+      for (unsigned int x = 0; x < face->glyph->bitmap.width; ++x)
+      {
+        textureBuffer[(row + y) * TEXTURE_WIDTH + col + x] =
+            face->glyph->bitmap.buffer[y * face->glyph->bitmap.width + x];
+      }
+    }
+
+    // Glyphs
+    Glyph& glyph = renderState.glyphs[glyphIdx];
+    glyph.textureCoords = {col, row};
+    glyph.size = 
+    { 
+      (int)face->glyph->bitmap.width, 
+      (int)face->glyph->bitmap.rows
+    };
+    glyph.advance = 
+    {
+      (float)(face->glyph->advance.x >> 6), 
+      (float)(face->glyph->advance.y >> 6)
+    };
+    glyph.offset =
+    {
+      (float)face->glyph->bitmap_left,
+      (float)face->glyph->bitmap_top,
+    };
+
+    col += face->glyph->bitmap.width + padding;
+  }
+
+  // init font textureID
+  {
+    glGenTextures(1, &glRenderer.fontAtlasID);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, glRenderer.fontAtlasID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+ 
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, TEXTURE_WIDTH, TEXTURE_WIDTH, 0, GL_RED, GL_UNSIGNED_BYTE, (char*)textureBuffer);
+  }
+
+  return true;
+}
+
+// #############################################################################
+//                           Functions
+// #############################################################################
 bool gl_init()
 {
   // init programID
@@ -143,6 +261,14 @@ bool gl_init()
     glGenBuffers(1, &glRenderer.transformSSBOID);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, glRenderer.transformSSBOID);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Transform) * MAX_TRANSFORM_COUNT, nullptr, GL_DYNAMIC_DRAW);
+  }
+
+  // load fonts
+  {
+    if(!load_font(FONT_FILE_PATH, 24))
+    {
+      return false;
+    }
   }
 
   // Set Uniform Locations
