@@ -61,11 +61,17 @@ void game_init()
   // init debug
   gameState.debug = false;
   
-  // Init game Camera
+  // Init Camera
   {
+    // game
     Camera &gameCamera = renderState.gameCamera;
     gameCamera.pos = {WORLD_WIDTH / 2, WORLD_HEIGHT / 2};
     gameCamera.size = {WORLD_WIDTH, WORLD_HEIGHT};
+
+    // ui
+    Camera &uiCamera = renderState.uiCamera;
+    uiCamera.pos = {WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2};
+    uiCamera.size = {WINDOW_WIDTH, WINDOW_HEIGHT};
   }
   
   // Init Player Data
@@ -98,19 +104,34 @@ void game_init()
 void game_update(float dt)
 {
   static const float SPEED = 1.0f;
+  static float PLAYER_SPEED = 1.0f;
 
   if (key_pressed(GLFW_KEY_Z)) gameState.debug = !gameState.debug;
   
   // Update Player
   Entity &player = gameState.player;
   {
-    if (key_down(GLFW_KEY_W)) player.pos.y -= 2 * SPEED;
-    if (key_down(GLFW_KEY_S)) player.pos.y += 2 * SPEED;
-    if (key_down(GLFW_KEY_A)) player.pos.x -= 2 * SPEED;
-    if (key_down(GLFW_KEY_D)) player.pos.x += 2 * SPEED;
+    if (key_down(GLFW_KEY_W)) player.pos.y -= PLAYER_SPEED;
+    if (key_down(GLFW_KEY_S)) player.pos.y += PLAYER_SPEED;
+    if (key_down(GLFW_KEY_A)) player.pos.x -= PLAYER_SPEED;
+    if (key_down(GLFW_KEY_D)) player.pos.x += PLAYER_SPEED;
     if (key_pressed(GLFW_KEY_Q))
     {
       SN_INFO("Music: is %s", music_is_playing(gameState.gameMusic) ? "Playing" : "Not Playing");
+    }
+    if (key_pressed(GLFW_KEY_UP))
+    {
+      PLAYER_SPEED += 1;
+      SN_INFO("Player Speed: %f", PLAYER_SPEED);
+    }
+    else if(key_pressed(GLFW_KEY_DOWN))
+    {
+      PLAYER_SPEED--;
+      if (PLAYER_SPEED < 0)
+      {
+        PLAYER_SPEED = 0;
+      }
+      SN_INFO("Player Speed: %f", PLAYER_SPEED);
     }
 
     // handle wall Collision
@@ -201,29 +222,37 @@ void game_render()
     render_sprite(player.spriteID, player.pos, 1.0f, player.animIdx);
   }
 
-  // renderCollider
+  // render ui
+  {
+    render_ui_quad({10, 10}, {100, 100}, {255, 0, 0, 255});
+    render_ui_sprite(SPRITE_SLIME, {40, 40}, 2.0f);
+  }
+
+  // render debug
   if (gameState.debug)
   {
     // render bat collider
     {
       Entity &bat = gameState.bat;
       const Rect &rect = get_entity_collider(bat);
-      render_quad(rect.pos, rect.size, {0, 255, 0});
+      render_quad(rect.pos, rect.size, {0, 255, 0, 120});
     }
     
     // render player collider
     {
       Entity &player = gameState.player;
       const Rect &rect = get_entity_collider(player);
-      render_quad(rect.pos, rect.size, {255, 0, 0});
+      render_quad(rect.pos, rect.size, {255, 0, 0, 120});
     }
   }
 }
 
 void game_cleanup()
 {
+  // free sounds
+  sound_free(gameState.bounceSound);
+
+  // free musics
   music_stop(gameState.gameMusic);
   music_free(gameState.gameMusic);
-
-  sound_free(gameState.bounceSound);
 }

@@ -58,7 +58,8 @@ bool display_create(const char *title, int width, int height, bool isResizable)
   glViewport(0, 0, width, height);
 
   // gl Enables
-  
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Show Window
   glfwShowWindow(window);

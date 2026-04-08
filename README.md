@@ -114,3 +114,7 @@
   ### 13. Score
   * update score
   * spawn_bat
+
+  ### 14. UI
+  * draw_ui_sprite
+  * draw_ui_quad

@@ -27,13 +27,19 @@ struct Camera
 
 struct RenderState
 {
+  // cameras
   Camera gameCamera;
+  Camera uiCamera;
 
   int fontHeight;
   Glyph glyphs[127];
   
+  // transforms
   Transform transforms[MAX_TRANSFORM_COUNT];
   int transformCount = 0;
+
+  Transform uiTransforms[MAX_TRANSFORM_COUNT];
+  int uiTransformCount = 0;
 };
 
 // #############################################################################
@@ -44,6 +50,22 @@ extern RenderState renderState;
 // #############################################################################
 //                           Functions
 // #############################################################################
-void render_sprite(SpriteID spriteID, Vec2 pos = {0, 0}, float scale = 1.0f, int animIdx = 0, Vec3 tintColor = {255, 255, 255});
-void render_quad(Vec2 pos, Vec2 size, Vec3 color = {255, 255, 255});
 int animate(SpriteID spriteID, float &timer, float duration, float dt);
+
+// rendering
+void render_sprite(SpriteID spriteID, 
+                   Vec2 pos = {0, 0}, 
+                   float scale = 1.0f, 
+                   int animIdx = 0, 
+                   Vec4 tintColor = {255, 255, 255, 255});
+
+void render_quad(Vec2 pos, Vec2 size, Vec4 color = {255, 255, 255, 255});
+
+// ui rendering
+void render_ui_sprite(SpriteID spriteID, 
+                   Vec2 pos = {0, 0}, 
+                   float scale = 1.0f, 
+                   int animIdx = 0, 
+                   Vec4 tintColor = {255, 255, 255, 255});
+
+void render_ui_quad(Vec2 pos, Vec2 size, Vec4 color = {255, 255, 255, 255});

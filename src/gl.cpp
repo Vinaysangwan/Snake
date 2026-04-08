@@ -298,15 +298,25 @@ void gl_render()
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  // Send View Matrix to GPU
+  // Game Data Transfer to GPU
   {
     Mat4 viewMatrix = view_matrix(renderState.gameCamera.pos, renderState.gameCamera.size, renderState.gameCamera.rot, WINDOW_WIDTH, WINDOW_HEIGHT);
     glUniformMatrix4fv(glRenderer.location_viewMatrix, 1, GL_FALSE, &viewMatrix[0]);
+
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderState.transformCount, &renderState.transforms[0]);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderState.transformCount);
+    renderState.transformCount = 0;
   }
 
-  glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderState.transformCount, &renderState.transforms[0]);
-  glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderState.transformCount);
-  renderState.transformCount = 0;
+  // Ui Data Transfer to GPU
+  {
+    Mat4 viewMatrix = view_matrix(renderState.uiCamera.pos, renderState.uiCamera.size, renderState.uiCamera.rot, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glUniformMatrix4fv(glRenderer.location_viewMatrix, 1, GL_FALSE, &viewMatrix[0]);
+
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(Transform) * renderState.uiTransformCount, &renderState.uiTransforms[0]);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, renderState.uiTransformCount);
+    renderState.uiTransformCount = 0;
+  }
 }
 
 void gl_cleanup()

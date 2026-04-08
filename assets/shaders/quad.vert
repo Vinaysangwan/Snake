@@ -7,7 +7,8 @@ layout (std430, binding = 0) buffer TransformSSBO
 
 // output
 layout (location = 0) out vec2 outTexCoords;
-layout (location = 1) out vec3 outTintColor;
+layout (location = 1) out vec4 outTintColor;
+layout (location = 2) out flat int outRenderingOptions;
 
 // uniforms
 uniform mat4 uProjectionMatrix;
@@ -31,7 +32,7 @@ void main()
   gl_Position = uProjectionMatrix * uViewMatrix * vec4(vertices[gl_VertexID], 0.0, 1.0);
 
   // Texture Coords
-  transform.atlasOffset.x += int(transform.tintColor.a) * transform.spriteSize.x;
+  transform.atlasOffset.x += transform.animIdx * transform.spriteSize.x;
 
   vec2 textureCoords[6] = {
     transform.atlasOffset,
@@ -44,5 +45,6 @@ void main()
   };
 
   outTexCoords = textureCoords[gl_VertexID];
-  outTintColor = transform.tintColor.rgb;
+  outTintColor = transform.tintColor;
+  outRenderingOptions = transform.renderingOptions;
 }

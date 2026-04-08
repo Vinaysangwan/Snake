@@ -30,4 +30,7 @@ struct Transform
   ivec2 atlasOffset;
   ivec2 spriteSize;
   vec4 tintColor;
+  int animIdx;
+  int renderingOptions;
+  int padding[2];
 };
