@@ -48,7 +48,7 @@ inline void logger(LoggerColor color, const char* prefix, const char* msg, Args.
 }
 
 // #############################################################################
-//                           File
+//                           File Handeling
 // #############################################################################
 char* read_file(const char* filePath);
 
@@ -93,6 +93,26 @@ struct Vec3
   };
 };
 
+struct IVec3
+{
+  union
+  {
+    struct
+    {
+      int x;
+      int y;
+      int z;
+    };
+
+    struct
+    {
+      int r;
+      int g;
+      int b;
+    };
+  };
+};
+
 struct Vec4
 {
   union
@@ -111,6 +131,28 @@ struct Vec4
       float g;
       float b;
       float a;
+    };
+  };
+};
+
+struct IVec4
+{
+  union
+  {
+    struct
+    {
+      int x;
+      int y;
+      int z;
+      int w;
+    };
+
+    struct
+    {
+      int r;
+      int g;
+      int b;
+      int a;
     };
   };
 };
