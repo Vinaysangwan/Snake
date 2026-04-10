@@ -100,6 +100,7 @@ bool load_font(const char* fontFilePath, int fontSize)
   if (FT_Init_FreeType(&ftLib))
   {
     SN_ERROR("Failed to Init Free type Lib");
+    FT_Done_FreeType(ftLib);
     return false;
   }
 
@@ -117,7 +118,7 @@ bool load_font(const char* fontFilePath, int fontSize)
   int col = padding;
 
   const int TEXTURE_WIDTH = 512;
-  char textureBuffer[TEXTURE_WIDTH * TEXTURE_WIDTH];
+  char textureBuffer[TEXTURE_WIDTH * TEXTURE_WIDTH] = {0};
   for (FT_ULong glyphIdx = 0; glyphIdx < 217; ++glyphIdx)
   {
     FT_UInt glyphIndex = FT_Get_Char_Index(face, glyphIdx);
@@ -184,6 +185,8 @@ bool load_font(const char* fontFilePath, int fontSize)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, TEXTURE_WIDTH, TEXTURE_WIDTH, 0, GL_RED, GL_UNSIGNED_BYTE, (char*)textureBuffer);
   }
 
+  FT_Done_Face(face);
+  FT_Done_FreeType(ftLib);
   return true;
 }
 
@@ -265,7 +268,7 @@ bool gl_init()
 
   // load fonts
   {
-    if(!load_font(FONT_FILE_PATH, 24))
+    if(!load_font(FONT_FILE_PATH, 16))
     {
       return false;
     }

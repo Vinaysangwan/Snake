@@ -69,3 +69,4 @@ void render_ui_sprite(SpriteID spriteID,
                    Vec4 tintColor = {255, 255, 255, 255});
 
 void render_ui_quad(Vec2 pos, Vec2 size, Vec4 color = {255, 255, 255, 255});
+void render_ui_text(const char *text, Vec2 pos, int fontSize = 24, Vec4 color = {255, 255, 255, 255});

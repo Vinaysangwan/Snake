@@ -118,3 +118,7 @@
   ### 14. UI
   * draw_ui_sprite
   * draw_ui_quad
+
+  ### 15. Font Rendering
+  * load_fonts
+  * render_ui_font

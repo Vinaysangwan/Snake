@@ -224,8 +224,7 @@ void game_render()
 
   // render ui
   {
-    render_ui_quad({10, 10}, {100, 100}, {255, 0, 0, 255});
-    render_ui_sprite(SPRITE_SLIME, {40, 40}, 2.0f);
+    render_ui_text("Score: 00", {20, 0}, 2);
   }
 
   // render debug
