@@ -22,7 +22,7 @@ void main()
   else if(bool(outRenderingOptions & RENDERING_OPTION_FONT))
   {
     vec4 fontColor = texelFetch(uFontSampler, ivec2(inTexCoords), 0);
-    
+
     outColor = fontColor.r * inTintColor;
   }
 }

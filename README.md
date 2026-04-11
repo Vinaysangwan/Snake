@@ -122,3 +122,4 @@
   ### 15. Font Rendering
   * load_fonts
   * render_ui_font
+  * render_ui_format_font

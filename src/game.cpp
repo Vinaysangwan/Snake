@@ -3,7 +3,6 @@
 #include "renderer.h"
 #include "inputs.h"
 #include "config.h"
-#include <fstream>
 
 // #############################################################################
 //                           Constants
@@ -224,7 +223,7 @@ void game_render()
 
   // render ui
   {
-    render_ui_text("Score: 00", {20, 0}, 2);
+    render_ui_format_text({20, 0}, 2, {255, 255, 255, 255}, "Score: %d", gameState.score);
   }
 
   // render debug

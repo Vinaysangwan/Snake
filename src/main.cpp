@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "utils.h"
 #include "display.h"
-#include "inputs.h"
-#include "gl.h"
-#include "game.h"
 #include "config.h"
-#include "audio.h"
 #include "shared_header.h"
+#include "gl.h"
+#include "audio.h"
+#include "game.h"
+#include "inputs.h"
 
 // #############################################################################
 //                           Constants

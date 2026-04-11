@@ -19,6 +19,23 @@ enum LoggerColor
 };
 
 template<typename ...Args>
+inline char* format_text(const char* msg, Args... args)
+{
+  static char textBuffer[8192];
+
+  if constexpr (sizeof...(args) == 0)
+  {
+    snprintf(textBuffer, sizeof(textBuffer), "%s", msg);
+  }
+  else
+  {
+    snprintf(textBuffer, sizeof(textBuffer), msg, args...);
+  }
+
+  return &textBuffer[0];
+}
+
+template<typename ...Args>
 inline void logger(LoggerColor color, const char* prefix, const char* msg, Args... args)
 {
   char textBuffer[8192];
