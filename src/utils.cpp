@@ -89,7 +89,7 @@ Mat4 view_matrix(Vec2 pos, Vec2 size, float rot, int screenW, int screenH)
 }
 
 // #############################################################################
-//                           Math
+//                           Random Functions
 // #############################################################################
 void random_init_seed()
 {

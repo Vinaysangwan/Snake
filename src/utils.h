@@ -261,7 +261,9 @@ inline constexpr int BIT(int x)
   return 1 << x;
 }
 
-// random number
+// #############################################################################
+//                           Random Functions
+// #############################################################################
 void random_init_seed();
 int random_get_int(int min, int max);
 float random_get_float(float max = 1.0f);

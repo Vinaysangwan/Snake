@@ -52,6 +52,29 @@ Rect get_entity_collider(const Entity &entity)
   };
 } 
 
+float move_to_target(Entity &entity, const Vec2 &destination, float speed)
+{
+  float xDistance = destination.x - entity.pos.x;
+  float yDistance = destination.y - entity.pos.y;
+  float distance = sqrtf(xDistance * xDistance + yDistance * yDistance);
+
+  if (distance <= speed)
+  {
+    entity.pos.x = destination.x;
+    entity.pos.y = destination.y;
+  }
+  else
+  {
+    float xNormal = xDistance / distance;
+    float yNormal = yDistance / distance;
+
+    entity.pos.x += xNormal * speed;
+    entity.pos.y += yNormal * speed;
+  }
+
+  return distance;
+}
+
 // #############################################################################
 //                           Functions
 // #############################################################################
@@ -78,7 +101,7 @@ void game_init()
     Entity &player = gameState.player;
     player.spriteID = SPRITE_SLIME;
     const Sprite &sprite = SPRITES[player.spriteID];
-    player.pos = {WORLD_WIDTH / 2 - sprite.size.x / 2.0f, WORLD_HEIGHT / 2 - sprite.size.y / 2.0f};
+    player.pos = {7 * GRID_SIZE, 4 * GRID_SIZE};
     player.speed = 1.0f;
   }
 
@@ -111,14 +134,38 @@ void game_update(float dt)
   // Update Player
   Entity &player = gameState.player;
   {
-    if (key_down(GLFW_KEY_W)) player.pos.y -= player.speed;
-    if (key_down(GLFW_KEY_S)) player.pos.y += player.speed;
-    if (key_down(GLFW_KEY_A)) player.pos.x -= player.speed;
-    if (key_down(GLFW_KEY_D)) player.pos.x += player.speed;
-    if (key_pressed(GLFW_KEY_Q))
+    static Vec2 destination = player.pos;
+    float distance = move_to_target(player, destination, player.speed);
+
+    if (distance == 0)
     {
-      SN_INFO("Music: is %s", music_is_playing(gameState.gameMusic) ? "Playing" : "Not Playing");
+      if (key_down(GLFW_KEY_W))
+      {
+        destination.y = player.pos.y - GRID_SIZE;
+
+        if (destination.y < TOP_WALL) destination.y = player.pos.y;
+      }
+      else if (key_down(GLFW_KEY_S)) 
+      {
+        destination.y = player.pos.y + GRID_SIZE;
+
+        if (destination.y > BOTTOM_WALL - 20) destination.y = player.pos.y;
+      }
+      else if (key_down(GLFW_KEY_A)) 
+      {
+        destination.x = player.pos.x - GRID_SIZE;
+
+        if (destination.x < LEFT_WALL) destination.x = player.pos.x;
+      }
+      else if (key_down(GLFW_KEY_D)) 
+      {
+        destination.x = player.pos.x + GRID_SIZE;
+        
+        if (destination.x > RIGHT_WALL - 20) destination.x = player.pos.x;
+      }
     }
+
+    // Player Debug stuff
     if (key_pressed(GLFW_KEY_UP))
     {
       player.speed += 1;
@@ -132,25 +179,6 @@ void game_update(float dt)
         player.speed = 0;
       }
       SN_INFO("Player Speed: %f", player.speed);
-    }
-
-    // handle wall Collision
-    if (player.pos.x < LEFT_WALL)
-    {
-      player.pos.x = LEFT_WALL;
-    }
-    else if(player.pos.x > RIGHT_WALL - 20)
-    {
-      player.pos.x = RIGHT_WALL - 20;
-    }
-
-    if (player.pos.y < TOP_WALL)
-    {
-      player.pos.y = TOP_WALL;
-    }
-    else if(player.pos.y > BOTTOM_WALL - 20)
-    {
-      player.pos.y = BOTTOM_WALL - 20;
     }
   }
 
@@ -181,6 +209,14 @@ void game_update(float dt)
       SN_INFO("Score: %d", gameState.score);
       spawn_bat();
       sound_play(gameState.collectSound);
+    }
+  }
+
+  // Game Debug Stuff
+  {
+    if (key_pressed(GLFW_KEY_Q))
+    {
+      SN_INFO("Music: is %s", music_is_playing(gameState.gameMusic) ? "Playing" : "Not Playing");
     }
   }
 
