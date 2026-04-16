@@ -79,6 +79,7 @@ void game_init()
     player.spriteID = SPRITE_SLIME;
     const Sprite &sprite = SPRITES[player.spriteID];
     player.pos = {WORLD_WIDTH / 2 - sprite.size.x / 2.0f, WORLD_HEIGHT / 2 - sprite.size.y / 2.0f};
+    player.speed = 1.0f;
   }
 
   // Init Bat Data
@@ -86,6 +87,8 @@ void game_init()
     Entity &bat = gameState.bat;
     bat.spriteID = SPRITE_BAT;
     bat.pos = {WORLD_WIDTH / 2, WORLD_HEIGHT / 2};
+    bat.speed = 1.0f;
+    bat.speed = 1.0f;
   }
 
   // Init Music
@@ -96,73 +99,59 @@ void game_init()
 
   // Init sounds
   {
-    gameState.bounceSound = sound_load("assets/audio/collect.wav");
+    gameState.bounceSound = sound_load("assets/audio/bounce.wav");
+    gameState.collectSound = sound_load("assets/audio/collect.wav");
   }
 }
 
 void game_update(float dt)
 {
-  static const float SPEED = 1.0f;
-  static float PLAYER_SPEED = 1.0f;
-
   if (key_pressed(GLFW_KEY_Z)) gameState.debug = !gameState.debug;
   
   // Update Player
   Entity &player = gameState.player;
   {
-    if (key_down(GLFW_KEY_W)) player.pos.y -= PLAYER_SPEED;
-    if (key_down(GLFW_KEY_S)) player.pos.y += PLAYER_SPEED;
-    if (key_down(GLFW_KEY_A)) player.pos.x -= PLAYER_SPEED;
-    if (key_down(GLFW_KEY_D)) player.pos.x += PLAYER_SPEED;
+    if (key_down(GLFW_KEY_W)) player.pos.y -= player.speed;
+    if (key_down(GLFW_KEY_S)) player.pos.y += player.speed;
+    if (key_down(GLFW_KEY_A)) player.pos.x -= player.speed;
+    if (key_down(GLFW_KEY_D)) player.pos.x += player.speed;
     if (key_pressed(GLFW_KEY_Q))
     {
       SN_INFO("Music: is %s", music_is_playing(gameState.gameMusic) ? "Playing" : "Not Playing");
     }
     if (key_pressed(GLFW_KEY_UP))
     {
-      PLAYER_SPEED += 1;
-      SN_INFO("Player Speed: %f", PLAYER_SPEED);
+      player.speed += 1;
+      SN_INFO("Player Speed: %f", player.speed);
     }
     else if(key_pressed(GLFW_KEY_DOWN))
     {
-      PLAYER_SPEED--;
-      if (PLAYER_SPEED < 0)
+      player.speed--;
+      if (player.speed < 0)
       {
-        PLAYER_SPEED = 0;
+        player.speed = 0;
       }
-      SN_INFO("Player Speed: %f", PLAYER_SPEED);
+      SN_INFO("Player Speed: %f", player.speed);
     }
 
     // handle wall Collision
-    bool bounceSoundPlay = false;
-    static bool prevBounceSoundPlay = bounceSoundPlay;
     if (player.pos.x < LEFT_WALL)
     {
       player.pos.x = LEFT_WALL;
-      bounceSoundPlay = true;
     }
     else if(player.pos.x > RIGHT_WALL - 20)
     {
       player.pos.x = RIGHT_WALL - 20;
-      bounceSoundPlay = true;
     }
 
     if (player.pos.y < TOP_WALL)
     {
       player.pos.y = TOP_WALL;
-      bounceSoundPlay = true;
     }
     else if(player.pos.y > BOTTOM_WALL - 20)
     {
       player.pos.y = BOTTOM_WALL - 20;
-      bounceSoundPlay = true;
     }
-
-    if (bounceSoundPlay && !prevBounceSoundPlay)
-    {
-      sound_play(gameState.bounceSound);
-    }
-    prevBounceSoundPlay = bounceSoundPlay;
   }
 
   // Update Bat
@@ -180,17 +169,18 @@ void game_update(float dt)
       directionY *= -1;
       sound_play(gameState.bounceSound);
     }
-    bat.pos.x += directionX * SPEED;
-    bat.pos.y += directionY * SPEED;
+    bat.pos.x += directionX * bat.speed;
+    bat.pos.y += directionY * bat.speed;
   }
 
   // update score
   {
-    if (collision_rects(get_entity_collider(gameState.player), get_entity_collider(gameState.bat)))
+    if (collision_rects(get_entity_collider(player), get_entity_collider(bat)))
     {
       gameState.score += 100;
       SN_INFO("Score: %d", gameState.score);
       spawn_bat();
+      sound_play(gameState.collectSound);
     }
   }
 
@@ -223,34 +213,39 @@ void game_render()
 
   // render ui
   {
-    render_ui_format_text({20, 0}, 2, {255, 255, 255, 255}, "Score: %d", gameState.score);
+    render_ui_format_text({20, 0}, 1, {255, 255, 255, 255}, "SCORE: %d", gameState.score);
   }
 
   // render debug
   if (gameState.debug)
   {
+    render_ui_quad({0, 64}, {500, 200});
+    
+    // render player collider
+    {;
+      Entity &player = gameState.player;
+      const Rect &rect = get_entity_collider(player);
+      render_quad(rect.pos, rect.size, {255, 0, 0, 120});
+      render_ui_format_text({20, 64}, 1, {255, 0, 0, 255}, "Player Speed: %d", (int)player.speed);
+    }
+
     // render bat collider
     {
       Entity &bat = gameState.bat;
       const Rect &rect = get_entity_collider(bat);
       render_quad(rect.pos, rect.size, {0, 255, 0, 120});
-    }
-    
-    // render player collider
-    {
-      Entity &player = gameState.player;
-      const Rect &rect = get_entity_collider(player);
-      render_quad(rect.pos, rect.size, {255, 0, 0, 120});
+      render_ui_format_text({20, 100}, 1, {255, 0, 0, 255}, "Bat Speed: %d", (int)bat.speed);
     }
   }
 }
 
 void game_cleanup()
 {
-  // free sounds
+  // free sound
   sound_free(gameState.bounceSound);
+  sound_free(gameState.collectSound);
 
-  // free musics
+  // free music
   music_stop(gameState.gameMusic);
   music_free(gameState.gameMusic);
 }

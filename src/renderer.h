@@ -69,9 +69,9 @@ void render_ui_sprite(SpriteID spriteID,
                    Vec4 tintColor = {255, 255, 255, 255});
 
 void render_ui_quad(Vec2 pos, Vec2 size, Vec4 color = {255, 255, 255, 255});
-void render_ui_text(const char *text, Vec2 pos, int fontSize = 24, Vec4 color = {255, 255, 255, 255});
+void render_ui_text(const char *text, Vec2 pos, float fontSize = 2, Vec4 color = {255, 255, 255, 255});
 template<typename ...Args>
-inline void render_ui_format_text(Vec2 pos, int fontSize, Vec4 color, const char* msg, Args ...args)
+inline void render_ui_format_text(Vec2 pos, float fontSize, Vec4 color, const char* msg, Args ...args)
 {
   render_ui_text(format_text(msg, args...), pos, fontSize, color);
 }

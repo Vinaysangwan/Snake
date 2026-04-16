@@ -130,7 +130,7 @@ void render_ui_quad(Vec2 pos, Vec2 size, Vec4 color)
   renderState.uiTransforms[renderState.uiTransformCount++] = transform;
 }
 
-void render_ui_text(const char *text, Vec2 pos, int fontSize, Vec4 color)
+void render_ui_text(const char *text, Vec2 pos, float fontSize, Vec4 color)
 {
   Vec2 initialPos = pos;
 
@@ -152,7 +152,7 @@ void render_ui_text(const char *text, Vec2 pos, int fontSize, Vec4 color)
     const Glyph &g = renderState.glyphs[(unsigned char)c];
     Transform transform = {
       .pos = {pos.x + g.offset.x * fontSize, pos.y + g.offset.y * fontSize},
-      .size = {static_cast<float>(g.size.x * fontSize), static_cast<float>(g.size.y * fontSize)},
+      .size = {g.size.x * fontSize, g.size.y * fontSize},
       .atlasOffset = g.textureCoords,
       .spriteSize = g.size,
       .tintColor = color,

@@ -268,7 +268,7 @@ bool gl_init()
 
   // load fonts
   {
-    if(!load_font(FONT_FILE_PATH, 16))
+    if(!load_font(FONT_FILE_PATH, 32))
     {
       return false;
     }

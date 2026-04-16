@@ -9,6 +9,8 @@ struct Entity
 {
   SpriteID spriteID;
   Vec2 pos;
+  float speed;
+
   float timer = 0.0f;
   int animIdx = 0;
 };
@@ -23,6 +25,7 @@ struct GameState
 
   // sounds
   Sound *bounceSound;
+  Sound *collectSound;
 
   // Score
   int score = 0;
