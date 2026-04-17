@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include "inputs.h"
 #include "config.h"
+#include "display.h"
 
 // #############################################################################
 //                           Constants
@@ -42,34 +43,36 @@ void spawn_bat()
   pos.y = gridY * GRID_SIZE;
 }
 
-Rect get_entity_collider(const Entity &entity)
+Rect get_entity_collider(SpriteID spriteID, Vec2 pos)
 {
-  const Sprite &sprite = SPRITES[entity.spriteID];
+  const Sprite &sprite = SPRITES[spriteID];
 
   return Rect{
-    .pos = Vec2{entity.pos.x + sprite.colliderOffset.x, entity.pos.y + sprite.colliderOffset.y},
+    .pos = Vec2{pos.x + sprite.colliderOffset.x, pos.y + sprite.colliderOffset.y},
     .size = ivec2_f(sprite.colliderSize)
   };
 } 
 
-float move_to_target(Entity &entity, const Vec2 &destination, float speed)
+float move_to_target(Vec2 &pos, const Vec2 &destination, float speed)
 {
-  float xDistance = destination.x - entity.pos.x;
-  float yDistance = destination.y - entity.pos.y;
+  float xDistance = destination.x - pos.x;
+  float yDistance = destination.y - pos.y;
   float distance = sqrtf(xDistance * xDistance + yDistance * yDistance);
 
   if (distance <= speed)
   {
-    entity.pos.x = destination.x;
-    entity.pos.y = destination.y;
+    pos.x = destination.x;
+    pos.y = destination.y;
+
+    return 0.0f;
   }
   else
   {
     float xNormal = xDistance / distance;
     float yNormal = yDistance / distance;
 
-    entity.pos.x += xNormal * speed;
-    entity.pos.y += yNormal * speed;
+    pos.x += xNormal * speed;
+    pos.y += yNormal * speed;
   }
 
   return distance;
@@ -98,11 +101,19 @@ void game_init()
   
   // Init Player Data
   {
-    Entity &player = gameState.player;
+    Snake &player = gameState.player;
     player.spriteID = SPRITE_SLIME;
-    const Sprite &sprite = SPRITES[player.spriteID];
-    player.pos = {7 * GRID_SIZE, 4 * GRID_SIZE};
-    player.speed = 1.0f;
+    player.speed = 1.5f;
+    player.direction = {1, 0};
+    player.nextDirection = player.direction;
+
+    // init player head
+    SnakeSection head;
+    head.pos = {7 * GRID_SIZE, 4 * GRID_SIZE};
+    head.prevPos = head.pos;
+    player.destination = head.pos;
+
+    player.sections[player.sectionCount++] = head;
   }
 
   // Init Bat Data
@@ -132,37 +143,60 @@ void game_update(float dt)
   if (key_pressed(GLFW_KEY_Z)) gameState.debug = !gameState.debug;
   
   // Update Player
-  Entity &player = gameState.player;
+  Snake &player = gameState.player;
   {
-    static Vec2 destination = player.pos;
-    float distance = move_to_target(player, destination, player.speed);
+    // update player head
+    SnakeSection &head = player.sections[0];
+    float distance = move_to_target(head.pos, player.destination, player.speed);
+    
+    // update player next direction
+    if (key_down(GLFW_KEY_W) && player.direction.y != 1)
+    {
+      player.nextDirection = {0, -1};
+    }
+    else if (key_down(GLFW_KEY_S) && player.direction.y != -1) 
+    {
+      player.nextDirection = {0, 1};
+    }
+    else if (key_down(GLFW_KEY_A) && player.direction.x != 1) 
+    {
+      player.nextDirection = {-1, 0};
+    }
+    else if (key_down(GLFW_KEY_D) && player.direction.x != -1) 
+    {
+      player.nextDirection = {1, 0};
+    }
 
+    // player align to Grid
     if (distance == 0)
     {
-      if (key_down(GLFW_KEY_W))
+      for (int i=0; i < player.sectionCount; ++i)
       {
-        destination.y = player.pos.y - GRID_SIZE;
+        player.sections[i].prevPos = player.sections[i].pos;
+      }
 
-        if (destination.y < TOP_WALL) destination.y = player.pos.y;
-      }
-      else if (key_down(GLFW_KEY_S)) 
-      {
-        destination.y = player.pos.y + GRID_SIZE;
+      // Update player direction
+      player.direction = player.nextDirection;
 
-        if (destination.y > BOTTOM_WALL - 20) destination.y = player.pos.y;
-      }
-      else if (key_down(GLFW_KEY_A)) 
+      // update player destination
+      player.destination.x = head.pos.x + player.direction.x * GRID_SIZE;
+      player.destination.y = head.pos.y + player.direction.y * GRID_SIZE;
+      
+      // Wall Clamp
+      if (player.destination.x < LEFT_WALL || player.destination.x > RIGHT_WALL - 20 || 
+          player.destination.y < TOP_WALL || player.destination.y > BOTTOM_WALL - 20)
       {
-        destination.x = player.pos.x - GRID_SIZE;
+        player.destination = head.pos;
+      }
+    }
 
-        if (destination.x < LEFT_WALL) destination.x = player.pos.x;
-      }
-      else if (key_down(GLFW_KEY_D)) 
-      {
-        destination.x = player.pos.x + GRID_SIZE;
-        
-        if (destination.x > RIGHT_WALL - 20) destination.x = player.pos.x;
-      }
+    // update player sections [except head]
+    for (int i=1; i < player.sectionCount; ++i)
+    {
+      SnakeSection &section = player.sections[i];
+      SnakeSection &prevSection = player.sections[i-1];
+
+      move_to_target(section.pos, prevSection.prevPos, player.speed);
     }
 
     // Player Debug stuff
@@ -203,12 +237,22 @@ void game_update(float dt)
 
   // update score
   {
-    if (collision_rects(get_entity_collider(player), get_entity_collider(bat)))
+    if (collision_rects(get_entity_collider(player.spriteID, player.sections[0].pos), get_entity_collider(bat.spriteID, bat.pos)))
     {
       gameState.score += 100;
-      SN_INFO("Score: %d", gameState.score);
       spawn_bat();
       sound_play(gameState.collectSound);
+
+      // Add new Section to player
+      if (player.sectionCount < MAX_SNAKE_SECTIONS)
+      {
+        const SnakeSection &tail = player.sections[player.sectionCount - 1];
+
+        SnakeSection section;
+        section.pos = tail.prevPos;
+
+        player.sections[player.sectionCount++] = section;
+      }
     }
   }
 
@@ -220,8 +264,11 @@ void game_update(float dt)
     }
   }
 
-  player.animIdx = animate(player.spriteID, player.timer, 1.0f, dt);
-  bat.animIdx = animate(bat.spriteID, bat.timer, 0.8f, dt);
+  // update animation index
+  {
+    player.animIdx = animate(player.spriteID, player.timer, 1.0f, dt);
+    bat.animIdx = animate(bat.spriteID, bat.timer, 0.8f, dt);
+  }
 }
 
 void game_render()
@@ -235,21 +282,29 @@ void game_render()
     render_sprite((SpriteID)((int)SPRITE_WALL_00 + MAP[i]), {c * GRID_SIZE, r * GRID_SIZE});
   }
 
+  // render player
+  {
+    Snake &player = gameState.player;
+
+    // render player sections
+    for (int i = player.sectionCount-1; i >= 0; --i)
+    {
+      SnakeSection &section = player.sections[i];
+      render_sprite(player.spriteID, section.pos, 1.0f, player.animIdx);
+    }
+    render_sprite(player.spriteID, player.sections[0].pos, 1.0f, player.animIdx, {0, 0, 255, 255});
+  }
+
   // render bat
   {
     Entity &bat = gameState.bat;
     render_sprite(bat.spriteID, bat.pos, 1.0f, bat.animIdx);
   }
 
-  // render player
-  {
-    Entity &player = gameState.player;
-    render_sprite(player.spriteID, player.pos, 1.0f, player.animIdx);
-  }
-
   // render ui
   {
     render_ui_format_text({20, 0}, 1, {255, 255, 255, 255}, "SCORE: %d", gameState.score);
+    render_ui_format_text({WINDOW_WIDTH - 250, 0}, 1, {255, 0, 0, 255}, "FPS: %d", get_fps());
   }
 
   // render debug
@@ -258,9 +313,9 @@ void game_render()
     render_ui_quad({0, 64}, {500, 200});
     
     // render player collider
-    {;
-      Entity &player = gameState.player;
-      const Rect &rect = get_entity_collider(player);
+    {
+      Snake &player = gameState.player;
+      const Rect &rect = get_entity_collider(player.spriteID, player.sections[0].pos);
       render_quad(rect.pos, rect.size, {255, 0, 0, 120});
       render_ui_format_text({20, 64}, 1, {255, 0, 0, 255}, "Player Speed: %d", (int)player.speed);
     }
@@ -268,7 +323,7 @@ void game_render()
     // render bat collider
     {
       Entity &bat = gameState.bat;
-      const Rect &rect = get_entity_collider(bat);
+      const Rect &rect = get_entity_collider(bat.spriteID, bat.pos);
       render_quad(rect.pos, rect.size, {0, 255, 0, 120});
       render_ui_format_text({20, 100}, 1, {255, 0, 0, 255}, "Bat Speed: %d", (int)bat.speed);
     }

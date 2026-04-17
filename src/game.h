@@ -3,6 +3,11 @@
 #include "audio.h"
 
 // #############################################################################
+//                           Constants
+// #############################################################################
+constexpr const int MAX_SNAKE_SECTIONS = 84;
+
+// #############################################################################
 //                           Structs
 // #############################################################################
 struct Entity
@@ -10,6 +15,28 @@ struct Entity
   SpriteID spriteID;
   Vec2 pos;
   float speed;
+
+  float timer = 0.0f;
+  int animIdx = 0;
+};
+
+struct SnakeSection
+{
+  Vec2 pos;
+  Vec2 prevPos;
+};
+
+struct Snake
+{
+  SpriteID spriteID;
+
+  float speed;
+  Vec2 direction;
+  Vec2 nextDirection;
+  Vec2 destination;
+
+  SnakeSection sections[MAX_SNAKE_SECTIONS];
+  int sectionCount = 0;
 
   float timer = 0.0f;
   int animIdx = 0;
@@ -31,7 +58,7 @@ struct GameState
   int score = 0;
   
   // entities
-  Entity player;
+  Snake player;
   Entity bat;
 };
 

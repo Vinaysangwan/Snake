@@ -256,6 +256,12 @@ inline constexpr T clamp(T v, T l, T h)
   return max(min(v, h), l);
 }
 
+template <typename T>
+inline constexpr T abs(T a)
+{
+  return a < 0 ? -a : a;
+}
+
 inline constexpr int BIT(int x)
 {
   return 1 << x;
